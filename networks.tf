@@ -101,8 +101,21 @@ resource "aws_nat_gateway" "nat_gw_1" {
   }
 }
 
+resource "aws_eip" "nat_eip_2" {
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "nat_gw_2" {
+  allocation_id = aws_eip.nat_eip_2.id
+  subnet_id     = aws_subnet.public_subnet_2.id
+  tags = {
+    project = "genarchi"
+    Name    = "genarchi-nat-gw-2"
+  }
+}
+
 # Route table for private subnets
-resource "aws_route_table" "private_rt" {
+resource "aws_route_table" "private_rt_1" {
   vpc_id = aws_vpc.genarchi_vpc.id
   route {
     cidr_block     = "0.0.0.0/0"
@@ -110,17 +123,29 @@ resource "aws_route_table" "private_rt" {
   }
   tags = {
     project = "genarchi"
-    Name    = "genarchi-private-rt"
+    Name    = "genarchi-private-rt-1"
+  }
+}
+
+resource "aws_route_table" "private_rt_2" {
+  vpc_id = aws_vpc.genarchi_vpc.id
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gw_2.id
+  }
+  tags = {
+    project = "genarchi"
+    Name    = "genarchi-private-rt-2"
   }
 }
 
 # Associate route table with private subnets
 resource "aws_route_table_association" "private_rt_assoc_1" {
   subnet_id      = aws_subnet.private_subnet_1.id
-  route_table_id = aws_route_table.private_rt.id
+  route_table_id = aws_route_table.private_rt_1.id
 }
 
 resource "aws_route_table_association" "private_rt_assoc_2" {
   subnet_id      = aws_subnet.private_subnet_2.id
-  route_table_id = aws_route_table.private_rt.id
+  route_table_id = aws_route_table.private_rt_2.id
 }
