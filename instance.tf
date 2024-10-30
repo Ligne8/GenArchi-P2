@@ -25,6 +25,20 @@ resource "aws_instance" "DB-2" {
   }
 }
 
+resource "aws_instance" "DB-LB" {
+  ami           = var.ubuntu-id
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.private_subnet_3.id
+  private_ip    = "10.0.5.10"
+  key_name      = "ligne8-key"
+  user_data     = file("scripts/db-lb.sh")
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id, aws_security_group.allow_postgres.id]
+  tags = {
+    Name = "app-1-genarchi"
+    project = "genarchi"
+  }
+}
+
 resource "aws_instance" "bastion" {
   ami           = var.ubuntu-id
   instance_type = "t2.micro"

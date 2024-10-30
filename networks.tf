@@ -63,6 +63,16 @@ resource "aws_subnet" "private_subnet_2" {
   }
 }
 
+resource "aws_subnet" "private_subnet_3" {
+  vpc_id            = aws_vpc.genarchi_vpc.id
+  cidr_block        = "10.0.5.0/24"
+  availability_zone = "eu-west-3c"
+  tags = {
+    project = "genarchi"
+    Name    = "genarchi-private-subnet-3"
+  }
+}
+
 # Route table for public subnets
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.genarchi_vpc.id
@@ -147,5 +157,10 @@ resource "aws_route_table_association" "private_rt_assoc_1" {
 
 resource "aws_route_table_association" "private_rt_assoc_2" {
   subnet_id      = aws_subnet.private_subnet_2.id
+  route_table_id = aws_route_table.private_rt_2.id
+}
+
+resource "aws_route_table_association" "private_rt_assoc_3" {
+  subnet_id      = aws_subnet.private_subnet_3.id
   route_table_id = aws_route_table.private_rt_2.id
 }
