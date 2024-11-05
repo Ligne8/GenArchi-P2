@@ -6,7 +6,7 @@ resource "aws_instance" "DB-1" {
   private_ip    = "10.0.3.10"
   vpc_security_group_ids = [aws_security_group.allow_ssh.id, aws_security_group.allow_postgres.id]
 
-  user_data = base64encode(templatefile("./scripts/db1.sh", { port = 3000 }))
+  user_data = templatefile("./scripts/db1.sh", {})
 
   tags = {
     Name = "DB-1-genarchi"
@@ -19,7 +19,7 @@ resource "aws_instance" "DB-2" {
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.private_subnet_2.id
   private_ip    = "10.0.4.10"
-  user_data = base64encode(templatefile("./scripts/db2.sh", { port = 3000 }))
+  user_data = templatefile("./scripts/db2.sh", {})
   key_name      = "ligne8-key"
   vpc_security_group_ids = [aws_security_group.allow_ssh.id, aws_security_group.allow_postgres.id]
   tags = {

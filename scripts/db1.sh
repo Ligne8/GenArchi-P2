@@ -14,6 +14,12 @@ LOGFILE="/tmp/db1.log"
 
 {
 
+  echo "Waiting for internet connection..."
+  while ! ping -c 1 -W 1 google.com; do
+    sleep 1
+  done
+  echo "Internet connection established."
+
 # Installation de PostgreSQL
 echo "Installing PostgreSQL..."
 apt-get update
