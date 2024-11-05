@@ -52,7 +52,7 @@ resource "aws_launch_configuration" "backend-launchconfig" {
   name_prefix     = "backend-launchconfig"
   image_id        = "ami-045a8ab02aadf4f88"
   instance_type   = "t2.micro"
-  key_name        = "ligne8-key" # may fail
+  key_name        = "ligne8-key"
   security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-port-3000.id]
   user_data       = templatefile("./scripts/backend.sh", { port = 3000 })
 
@@ -66,7 +66,7 @@ resource "aws_launch_configuration" "frontend-launchconfig" {
   name_prefix     = "frontend-launchconfig"
   image_id        = "ami-045a8ab02aadf4f88"
   instance_type   = "t2.micro"
-  key_name        = "ligne8-key" # may fail
+  key_name        = "ligne8-key" 
   security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-http-https.id]
   user_data       = templatefile("./scripts/frontend.sh", { port = 3000 })
 
@@ -76,9 +76,9 @@ resource "aws_launch_configuration" "frontend-launchconfig" {
 }
 
 # ASG Backend
-resource "aws_autoscaling_group" "backend-autoscaling" {
-  name                      = "backend-autoscaling"
-  vpc_zone_identifier       = [aws_subnet.private_subnet_1, aws_subnet.private_subnet_2]
+resource "aws_autoscaling_group" "backend-asg" {
+  name                      = "backend-asg"
+  vpc_zone_identifier       = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
   launch_configuration      = aws_launch_configuration.backend-launchconfig.name
   min_size                  = 1
   desired_capacity          = 2
@@ -96,9 +96,9 @@ resource "aws_autoscaling_group" "backend-autoscaling" {
 }
 
 # ASG Frontend
-resource "aws_autoscaling_group" "frontend-autoscaling" {
-  name                      = "frontend-autoscaling"
-  vpc_zone_identifier       = [aws_subnet.private_subnet_1, aws_subnet.private_subnet_2]
+resource "aws_autoscaling_group" "frontend-asg" {
+  name                      = "frontend-asg"
+  vpc_zone_identifier       = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
   launch_configuration      = aws_launch_configuration.frontend-launchconfig.name
   min_size                  = 1
   desired_capacity          = 2
@@ -186,7 +186,7 @@ resource "aws_lb_target_group" "webapp-back-target-group" {
 
 resource "aws_autoscaling_policy" "cpu-policy-scaleup-frontend" {
   name                   = "cpu-policy-scaleup-frontend-asg"
-  autoscaling_group_name = "frontend-autoscaling"
+  autoscaling_group_name = "frontend-asg"
   adjustment_type        = "ChangeInCapacity"
   scaling_adjustment     = 1 
   cooldown               = 300
@@ -195,7 +195,7 @@ resource "aws_autoscaling_policy" "cpu-policy-scaleup-frontend" {
 
 resource "aws_autoscaling_policy" "cpu-policy-scaleup-backend" {
   name                   = "cpu-policy-scaleup-backend-asg"
-  autoscaling_group_name = "backend-autoscaling"
+  autoscaling_group_name = "backend-asg"
   adjustment_type        = "ChangeInCapacity"
   scaling_adjustment     = 1 
   cooldown               = 300
