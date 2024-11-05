@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Variables
 PGDATA="/var/lib/postgresql/16/main"  # Chemin vers le répertoire des données PostgreSQL
 PGCONF="/etc/postgresql/16/main/postgresql.conf"
@@ -8,15 +10,17 @@ REPL_NET="10.0.4.10/32"  # Réseau autorisé pour la réplication
 LOGFILE="/tmp/db1.log"
 
 
+
+
+{
+
 # Installation de PostgreSQL
 echo "Installing PostgreSQL..."
 apt-get update
 apt-get install -y postgresql postgresql-contrib
 
-
-{
 # Initialisation du serveur PostgreSQL
-systemctl start postgresql
+systemctl stop postgresql
 
 echo "wal_level = replica" >> $PGCONF
 echo "max_wal_senders = 3" >> $PGCONF
@@ -27,10 +31,17 @@ echo "listen_addresses = '*'" >> $PGCONF
 echo "host    replication     replicator      10.0.4.10/32    md5" >> $PGHBA
 
 # Redémarrer PostgreSQL pour appliquer les modifications
+
+systemctl start postgresql
 systemctl restart postgresql
+
 
 # Créer l'utilisateur de réplication
 sudo -u postgres psql -c "CREATE USER $REPL_USER REPLICATION LOGIN ENCRYPTED PASSWORD '$REPL_PASSWORD';"
+
+sudo -u postgres psql -c "create user genarchi with password 'genarchi';" 
+sudo -u postgres psql -c "create database genarchidb with owner genarchi;"
+sudo -u postgres psql -c "grant all privileges on database genarchidb to genarchi;"
 
 echo "Configuration du serveur principal terminée."
 } >> $LOGFILE 2>&1
