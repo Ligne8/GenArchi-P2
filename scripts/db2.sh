@@ -1,4 +1,5 @@
-# Variables
+#!/bin/bash
+
 # Variables
 PGDATA="/var/lib/postgresql/16/main"  # Chemin vers le répertoire des données PostgreSQL
 PGCONF="/etc/postgresql/16/main/postgresql.conf"  # Chemin vers postgresql.conf
@@ -10,15 +11,20 @@ LOGFILE="/tmp/db2.log"
 
 
 
-  echo "Waiting for 2 minutes..."
-  sleep 240
 
-  echo "Installing PostgreSQL..."
-  apt-get update
-  apt-get install -y postgresql postgresql-contrib
 
 {
-systemctl stop postgresql
+
+echo "Installing PostgreSQL..."
+apt-get update
+apt-get install -y postgresql postgresql-contrib
+
+echo "Waiting for the master host to listen on port 5432..."
+while ! nc -w 3 -z $MASTER_HOST 5432; do   
+  sleep 1
+done
+echo "Master host is now listening on port 5432."
+systemctl start postgresql
 
 # Supprimer les données existantes
 rm -rf $PGDATA/*
@@ -50,8 +56,12 @@ echo "local   all             postgres                                peer" >> $
 echo "host    all             all             127.0.0.1/32            md5" >> $PGHBA
 echo "host    all             all             ::1/128                 md5" >> $PGHBA
 
+
+
 # Démarrer PostgreSQL sur le serveur secondaire
-systemctl start postgresql
+systemctl restart postgresql
+
 
 echo "Configuration du serveur secondaire terminée."
+
 } >> $LOGFILE 2>&1
