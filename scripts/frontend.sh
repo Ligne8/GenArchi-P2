@@ -4,17 +4,24 @@ apt-get update
 apt upgrade -y
 
 # Install git
-apt-get install git -y
+#apt-get install git -y
 
 # Clone the repository
-git clone https://github.com/Ligne8/GenArchi-P2.git app
+#git clone https://github.com/Ligne8/GenArchi-P2.git app
 
 # Install npm
-apt-get install npm -y
+#apt-get install npm -y
 
 # Install nodejs
-apt-get install nodejs -y
+#apt-get install nodejs -y
 
-cd app/website/frontend
+#cd app/website/frontend
 
-npm install
+#npm install
+
+# Install nginx
+apt-get install nginx -y
+
+# Start nginx
+systemctl enable nginx
+systemctl start nginx
