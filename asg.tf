@@ -183,3 +183,118 @@ resource "aws_lb_target_group" "webapp-back-target-group" {
     matcher             = "200"
   }
 }
+
+resource "aws_autoscaling_policy" "cpu-policy-scaleup-frontend" {
+  name                   = "cpu-policy-scaleup-frontend-asg"
+  autoscaling_group_name = "frontend-autoscaling"
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = 1 
+  cooldown               = 300
+  policy_type            = "SimpleScaling"
+}
+
+resource "aws_autoscaling_policy" "cpu-policy-scaleup-backend" {
+  name                   = "cpu-policy-scaleup-backend-asg"
+  autoscaling_group_name = "backend-autoscaling"
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = 1 
+  cooldown               = 300
+  policy_type            = "SimpleScaling"
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu-alarm-scaleup-frontend" {
+  alarm_name          = "cpu-alarm-frontend-asg"
+  alarm_description   = "cpu-alarm-frontend-asg"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 120 #seconds 10
+  statistic           = "Average"
+  threshold           = 50
+
+  dimensions = {
+    "AutoScalingGroupName" = "frontend-asg"
+  }
+
+  actions_enabled = true
+  alarm_actions   = [aws_autoscaling_policy.cpu-policy-scaleup-frontend.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu-alarm-scaleup-backend" {
+  alarm_name          = "cpu-alarm-backend-asg"
+  alarm_description   = "cpu-alarm-backend-asg"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 120 #seconds 10
+  statistic           = "Average"
+  threshold           = 50
+
+  dimensions = {
+    "AutoScalingGroupName" = "backend-asg"
+  }
+
+  actions_enabled = true
+  alarm_actions   = [aws_autoscaling_policy.cpu-policy-scaleup-backend.arn]
+}
+
+
+# Scale down alarm
+resource "aws_autoscaling_policy" "cpu-policy-scaledown-backend" {
+  name                   = "cpu-policy-scaledown-backend-asg"
+  autoscaling_group_name = "backend-asg"
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = "-1"
+  cooldown               = 120
+  policy_type            = "SimpleScaling"
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu-alarm-scaledown-backend" {
+  alarm_name          = "cpu-alarm-scaledown-backend-asg"
+  alarm_description   = "cpu-alarm-scaledown-backend-asg"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 120 #10
+  statistic           = "Average"
+  threshold           = 5
+
+  dimensions = {
+    "AutoScalingGroupName" = "backend-asg"
+  }
+
+  actions_enabled = true
+  alarm_actions   = [aws_autoscaling_policy.cpu-policy-scaledown-backend.arn]
+}
+
+# Scale down alarm
+resource "aws_autoscaling_policy" "cpu-policy-scaledown-frontend" {
+  name                   = "cpu-policy-scaledown-frontend-asg"
+  autoscaling_group_name = "frontend-asg"
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = "-1"
+  cooldown               = 120
+  policy_type            = "SimpleScaling"
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu-alarm-scaledown-frontend" {
+  alarm_name          = "cpu-alarm-scaledown-frontend-asg"
+  alarm_description   = "cpu-alarm-scaledown-frontend-asg"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 120 #10
+  statistic           = "Average"
+  threshold           = 5
+
+  dimensions = {
+    "AutoScalingGroupName" = "frontend-asg"
+  }
+
+  actions_enabled = true
+  alarm_actions   = [aws_autoscaling_policy.cpu-policy-scaledown-frontend.arn]
+}
