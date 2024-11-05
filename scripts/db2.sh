@@ -15,6 +15,12 @@ LOGFILE="/tmp/db2.log"
 
 {
 
+  echo "Waiting for internet connection..."
+  while ! ping -c 1 -W 1 google.com; do
+    sleep 1
+  done
+  echo "Internet connection established."
+
 echo "Installing PostgreSQL..."
 apt-get update
 apt-get install -y postgresql postgresql-contrib
@@ -24,6 +30,7 @@ while ! nc -w 3 -z $MASTER_HOST 5432; do
   sleep 1
 done
 echo "Master host is now listening on port 5432."
+
 systemctl start postgresql
 
 # Supprimer les données existantes
