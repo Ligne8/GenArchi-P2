@@ -1,5 +1,6 @@
 #!/bin/sh
 
+{
 apt-get update
 apt upgrade -y
 
@@ -24,3 +25,4 @@ sleep 240
 npx prisma migrate dev --name init
 npx prisma generate
 npx ts-node index.ts
+} >> /tmp/backend.log 2>&1

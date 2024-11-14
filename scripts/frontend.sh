@@ -1,5 +1,6 @@
 #!/bin/sh
 
+{
 apt-get update
 apt upgrade -y
 
@@ -29,3 +30,4 @@ apt-get install nginx -y
 # Start nginx
 systemctl enable nginx
 systemctl start nginx
+} >> /tmp/frontend.log 2>&1
