@@ -76,7 +76,7 @@ resource "aws_launch_template" "frontend-launchtemplate" {
     security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-port-3000.id]
   }
 
-  user_data = base64encode(templatefile("./scripts/frontend.sh", { BACKEND_URL = aws_autoscaling_group.backend-asg.name }))
+  user_data = base64encode(templatefile("./scripts/frontend.sh", { BACKEND_URL = aws_lb.webapp-alb.dns_name }))
 
   lifecycle {
     create_before_destroy = true
