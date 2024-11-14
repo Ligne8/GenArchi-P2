@@ -6,7 +6,7 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket         = "genarchi2"
+    bucket         = "genarchi"
     key            = "terraform.tfstate"
     region         = "eu-west-3"
   }

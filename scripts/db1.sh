@@ -35,6 +35,7 @@ echo "listen_addresses = '*'" >> $PGCONF
 
 # Ajouter une entrée dans pg_hba.conf pour l'utilisateur de réplication
 echo "host    replication     replicator      10.0.4.10/32    md5" >> $PGHBA
+echo "host    genarchidb     genarchi      10.0.0.0/16    md5" >> $PGHBA
 
 # Redémarrer PostgreSQL pour appliquer les modifications
 
