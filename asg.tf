@@ -47,6 +47,25 @@ resource "aws_security_group" "sg-allow-port-3000" {
   }
 }
 
+resource "aws_security_group" "sg-allow-8080" {
+  name        = "allow-8080"
+  description = "Security group to allow port 8080"
+  vpc_id      = aws_vpc.genarchi_vpc.id
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 # Launch template for backend ASG
 resource "aws_launch_template" "backend-launchtemplate" {
   name_prefix   = "backend-launchtemplate"
@@ -73,7 +92,7 @@ resource "aws_launch_template" "frontend-launchtemplate" {
   key_name      = "ligne8-key"
 
   network_interfaces {
-    security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-port-3000.id]
+    security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-port-3000.id, aws_security_group.sg-allow-http-https.id]
   }
 
   user_data = base64encode(templatefile("./scripts/frontend.sh", { BACKEND_URL = aws_lb.webapp-alb.dns_name }))
@@ -134,7 +153,7 @@ resource "aws_lb" "webapp-alb" {
   internal           = false
   load_balancer_type = "application"
   subnets            = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-  security_groups    = [aws_security_group.sg-allow-http-https.id, aws_security_group.sg-allow-port-3000.id]
+  security_groups    = [aws_security_group.sg-allow-http-https.id, aws_security_group.sg-allow-port-3000.id, aws_security_group.sg-allow-8080.id] 
 
   tags = {
     Name = "webapp-alb-tf"
@@ -168,7 +187,7 @@ resource "aws_lb_listener" "backend" {
 # ALB Target front
 resource "aws_lb_target_group" "webapp-front-target-group" {
   name     = "webapp-front-tg"
-  port     = 3000
+  port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.genarchi_vpc.id
   health_check {
