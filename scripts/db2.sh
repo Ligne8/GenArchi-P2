@@ -85,7 +85,6 @@ echo "host    all             all             ::1/128                 md5" >> $P
 # Démarrer PostgreSQL sur le serveur secondaire
 systemctl restart postgresql
 
-
 echo "Configuration du serveur secondaire terminée."
 
 echo "setting up cron job for failover"
