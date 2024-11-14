@@ -15,6 +15,12 @@ apt-get install npm -y
 # Install nodejs
 apt-get install nodejs -y
 
-cd app/website/backend
+cd app/backend
 
 npm install
+
+sleep 240
+
+npx prisma migrate dev --name init
+npx prisma generate
+npx ts-node index.ts
