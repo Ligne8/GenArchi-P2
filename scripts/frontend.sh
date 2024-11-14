@@ -1,5 +1,7 @@
 #!/bin/sh
 
+{
+
 apt-get update
 apt upgrade -y
 
@@ -22,3 +24,5 @@ npm install
 sed -i '' "s|const API_GATEWAY_URL = \".*\"|const API_GATEWAY_URL = \"$BACKEND_URL\"|g" index.html
 
 npm start
+
+} >> /tmp/frontend.log 2>&1
