@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 
-const API_GATEWAY_URL = "https://w4hlp2f9z0.execute-api.eu-west-3.amazonaws.com/http_api_stage"
+const API_GATEWAY_URL = "http://localhost:4000"
 
 const Portfolio = () => {
     const [newMember, setNewMember] = useState({ name: '', role: '', image: '' });
@@ -15,32 +15,44 @@ const Portfolio = () => {
     const fetchMembers = async () => {
         const response = await fetch(API_GATEWAY_URL + '/members');
         const data = await response.json();
-        console.log('Data from API:', data);
-        setMembers(data.Items);
+        console.log('Data from API:', data); // Inspectez cette structure
+        setMembers(data.Items || data); // Utilise data.Items s'il existe, sinon data directement
     };
 
     const handleAddMember = async () => {
         console.log('New member:', newMember.name, newMember.role, newMember.image);
+    
+        // Vérifiez que newMember contient bien les données
+        if (!newMember.name || !newMember.role || !newMember.image) {
+            console.error('New member data is incomplete');
+            return;
+        }
+    
         const response = await fetch(API_GATEWAY_URL + '/members', {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-                Item: {
-                    name: newMember.name,
-                    role: newMember.role,
-                    image: newMember.image
-                },
+                name: newMember.name,
+                role: newMember.role,
+                image: newMember.image
             })
-        }).catch(error => console.error('Error:', error)
-        );
-        const data = await response.json();
-        console.log('Response from API:', data);
-        setNewMember({ name: '', role: '', image: '' }); // Réinitialiser le formulaire
-        fetchMembers(); // Recharger les membres
+        }).catch(error => console.error('Error:', error));
+    
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Response from API:', data);
+            setNewMember({ name: '', role: '', image: '' }); // Réinitialiser le formulaire
+            fetchMembers(); // Recharger les membres
+        } else {
+            console.error('Failed to add member:', response.statusText);
+        }
     };
 
     const handleDeleteMember = async (id) => {
         console.log("Member to delete:", id);
-        const response = await fetch(API_GATEWAY_URL + '/members', {
+        const response = await fetch(API_GATEWAY_URL + '/members/' + id, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
