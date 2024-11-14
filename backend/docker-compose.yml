@@ -1,0 +1,21 @@
+services:
+  postgres-master:
+    image: postgres:16-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres/master:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=genarchi
+      - POSTGRES_USER=genarchi
+      - POSTGRES_DB=genarchidb
+  postgres-standby:
+    image: postgres:16-alpine
+    ports:
+      - 5433:5432
+    volumes:
+      - ~/apps/postgres/standby:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=genarchi
+      - POSTGRES_USER=genarchi
+      - POSTGRES_DB=genarchidb
