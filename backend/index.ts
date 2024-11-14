@@ -78,6 +78,11 @@ app.delete('/members/:id', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/health', async (req: Request, res: Response) => {
+  const isMasterAccessible = await isDatabaseAccessible(masterUrl);
+  res.status(200).json({ isMasterAccessible });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Serveur en écoute sur le port ${PORT}`);
