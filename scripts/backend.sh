@@ -19,6 +19,7 @@ apt-get install nodejs -y
 cd app/backend
 
 npm install
+npm install -g typescript ts-node
 
 sleep 240
 
