@@ -21,7 +21,7 @@ cd app/app
 
 npm install
 
-sed -i '' "s|const API_GATEWAY_URL = \".*\"|const API_GATEWAY_URL = \"$BACKEND_URL\"|g" index.html
+sed -i '' "s|const API_GATEWAY_URL = \".*\"|const API_GATEWAY_URL = \"$BACKEND_URL\"|g" src/App.js
 
 npm start
 

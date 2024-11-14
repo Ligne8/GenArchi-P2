@@ -13,7 +13,7 @@ const Portfolio = () => {
     }, []);
 
     const fetchMembers = async () => {
-        const response = await fetch(API_GATEWAY_URL + '/ligne8?TableName=ligne8DB');
+        const response = await fetch(API_GATEWAY_URL + '/members');
         const data = await response.json();
         console.log('Data from API:', data);
         setMembers(data.Items);
@@ -21,7 +21,7 @@ const Portfolio = () => {
 
     const handleAddMember = async () => {
         console.log('New member:', newMember.name, newMember.role, newMember.image);
-        const response = await fetch(API_GATEWAY_URL + '/ligne8', {
+        const response = await fetch(API_GATEWAY_URL + '/member', {
             method: 'POST',
             body: JSON.stringify({
                 Item: {
@@ -29,7 +29,6 @@ const Portfolio = () => {
                     role: newMember.role,
                     image: newMember.image
                 },
-                TableName: 'ligne8DB'
             })
         }).catch(error => console.error('Error:', error)
         );
@@ -41,7 +40,7 @@ const Portfolio = () => {
 
     const handleDeleteMember = async (id) => {
         console.log("Member to delete:", id);
-        const response = await fetch(API_GATEWAY_URL + '/ligne8', {
+        const response = await fetch(API_GATEWAY_URL + '/member', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -50,7 +49,6 @@ const Portfolio = () => {
                 Key: {
                     name: id
                 },
-                TableName: 'ligne8DB'
             })
         }).catch(error => console.error('Error:', error)
         );
