@@ -21,7 +21,7 @@ const Portfolio = () => {
 
     const handleAddMember = async () => {
         console.log('New member:', newMember.name, newMember.role, newMember.image);
-        const response = await fetch(API_GATEWAY_URL + '/member', {
+        const response = await fetch(API_GATEWAY_URL + '/members', {
             method: 'POST',
             body: JSON.stringify({
                 Item: {
@@ -40,7 +40,7 @@ const Portfolio = () => {
 
     const handleDeleteMember = async (id) => {
         console.log("Member to delete:", id);
-        const response = await fetch(API_GATEWAY_URL + '/member', {
+        const response = await fetch(API_GATEWAY_URL + '/members', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
