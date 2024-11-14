@@ -22,10 +22,3 @@ npm install
 sed -i '' "s|const API_GATEWAY_URL = \".*\"|const API_GATEWAY_URL = \"$BACKEND_URL\"|g" index.html
 
 npm start
-
-# Install nginx
-apt-get install nginx -y
-
-# Start nginx
-systemctl enable nginx
-systemctl start nginx

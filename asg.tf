@@ -187,7 +187,7 @@ resource "aws_lb_listener" "backend" {
 # ALB Target front
 resource "aws_lb_target_group" "webapp-front-target-group" {
   name     = "webapp-front-tg"
-  port     = 80
+  port     = 3000
   protocol = "HTTP"
   vpc_id   = aws_vpc.genarchi_vpc.id
   health_check {

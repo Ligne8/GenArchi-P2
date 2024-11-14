@@ -79,6 +79,7 @@ echo "Configuration de pg_hba.conf pour les connexions locales et en lecture seu
 echo "local   all             postgres                                peer" >> $PGHBA
 echo "host    all             all             127.0.0.1/32            md5" >> $PGHBA
 echo "host    all             all             ::1/128                 md5" >> $PGHBA
+echo "host    genarchidb             genarchi 10.0.0.0/16 md5" >> $PGHBA
 
 
 
