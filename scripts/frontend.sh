@@ -24,9 +24,10 @@ npm install
 
 echo "######################################"
 echo $BACKEND_URL
+echo $test
 echo "######################################"
 
-sed -i '' "s|const API_GATEWAY_URL = \".*\"|const API_GATEWAY_URL = \"$BACKEND_URL\"|g" /app/app/src/Portfolio.js
+sed -i "s|const API_GATEWAY_URL = \".*\"|const API_GATEWAY_URL = \"$BACKEND_URL\"|g" /app/app/src/Portfolio.js
 
 npm start
 

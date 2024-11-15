@@ -27,6 +27,27 @@ resource "aws_security_group" "sg-allow-http-https" {
 }
 
 # Security group for port 3000
+resource "aws_security_group" "sg-allow-port-4000" {
+  name        = "allow-port-4000"
+  description = "Security group to allow port 4000"
+  vpc_id      = aws_vpc.genarchi_vpc.id
+
+  ingress {
+    from_port   = 4000
+    to_port     = 4000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Security group for port 3000
 resource "aws_security_group" "sg-allow-port-3000" {
   name        = "allow-port-3000"
   description = "Security group to allow port 3000"
@@ -74,10 +95,10 @@ resource "aws_launch_template" "backend-launchtemplate" {
   key_name      = "ligne8-key"
 
   network_interfaces {
-    security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-port-3000.id]
+    security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-port-4000.id]
   }
 
-  user_data = base64encode(templatefile("./scripts/backend.sh", { port = 3000 }))
+  user_data = base64encode(templatefile("./scripts/backend.sh", {}))
 
   lifecycle {
     create_before_destroy = true
@@ -95,7 +116,7 @@ resource "aws_launch_template" "frontend-launchtemplate" {
     security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-port-3000.id, aws_security_group.sg-allow-http-https.id]
   }
 
-  user_data = base64encode(templatefile("./scripts/frontend.sh", { BACKEND_URL = aws_lb.webapp-alb.dns_name }))
+  user_data = base64encode(templatefile("./scripts/frontend.sh", { BACKEND_URL = aws_lb.webapp-alb.dns_name, test="coucou" }))
 
   lifecycle {
     create_before_destroy = true
