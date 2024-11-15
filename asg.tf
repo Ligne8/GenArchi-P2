@@ -203,7 +203,7 @@ resource "aws_lb_target_group" "webapp-front-target-group" {
 # ALB Target back
 resource "aws_lb_target_group" "webapp-back-target-group" {
   name     = "webapp-back-tg"
-  port     = 3000
+  port     = 4000
   protocol = "HTTP"
   vpc_id   = aws_vpc.genarchi_vpc.id
   health_check {
