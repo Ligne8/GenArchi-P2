@@ -23,11 +23,11 @@ cd /app/app
 npm install
 
 echo "######################################"
-echo $BACKEND_URL
-echo $test
+echo ${BACKEND_URL}
+echo ${test}
 echo "######################################"
 
-sed -i "s|const API_GATEWAY_URL = \".*\"|const API_GATEWAY_URL = \"$BACKEND_URL\"|g" /app/app/src/Portfolio.js
+sed -i "s|const API_GATEWAY_URL = \".*\"|const API_GATEWAY_URL = \"http://${BACKEND_URL}:8080\"|g" /app/app/src/Portfolio.js
 
 npm start
 

@@ -116,7 +116,7 @@ resource "aws_launch_template" "frontend-launchtemplate" {
     security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-port-3000.id, aws_security_group.sg-allow-http-https.id]
   }
 
-  user_data = base64encode(templatefile("./scripts/frontend.sh", { BACKEND_URL = aws_lb.webapp-alb.dns_name, test="coucou" }))
+  user_data = base64encode(templatefile("./scripts/frontend.sh", { BACKEND_URL=aws_lb.webapp-alb.dns_name, test="coucou" }))
 
   lifecycle {
     create_before_destroy = true
@@ -130,7 +130,7 @@ resource "aws_autoscaling_group" "backend-asg" {
     id      = aws_launch_template.backend-launchtemplate.id
     version = "$Latest"
   }
-  min_size                  = 1
+  min_size                  = 2
   desired_capacity          = 2
   max_size                  = 4
   health_check_grace_period = 300
@@ -153,13 +153,15 @@ resource "aws_autoscaling_group" "frontend-asg" {
     id      = aws_launch_template.frontend-launchtemplate.id
     version = "$Latest"
   }
-  min_size                  = 1
+  min_size                  = 2
   desired_capacity          = 2
   max_size                  = 4
   health_check_grace_period = 300
   health_check_type         = "ELB"
   target_group_arns         = [aws_lb_target_group.webapp-front-target-group.arn]
   force_delete              = true
+
+  depends_on = [aws_lb.webapp-alb]
 
   tag {
     key                 = "Name"
