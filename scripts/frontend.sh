@@ -8,8 +8,9 @@ apt upgrade -y
 #Install git
 apt-get install git -y
 
+mkdir /app
 #Clone the repository
-git clone https://github.com/Ligne8/GenArchi-P2.git app
+git clone https://github.com/Ligne8/GenArchi-P2.git /app
 
 #Install npm
 apt-get install npm -y
@@ -17,7 +18,7 @@ apt-get install npm -y
 #Install nodejs
 apt-get install nodejs -y
 
-cd app/app
+cd /app/app
 
 npm install
 
