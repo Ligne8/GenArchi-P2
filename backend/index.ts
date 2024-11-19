@@ -1,7 +1,7 @@
-import express, { Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { Client } from 'pg';
-import cors from 'cors';
+import express, { Request, Response, NextFunction } from "express";
+import { PrismaClient } from "@prisma/client";
+import { Client } from "pg";
+import cors from "cors";
 
 const app = express();
 app.use(cors());
@@ -36,16 +36,16 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
   req.prisma = isMasterAccessible ? prismaClients.master : prismaClients.standby;
 
   if (!isMasterAccessible) {
-    console.warn('Basculement vers la base de données de secours.');
+    console.warn("Basculement vers la base de données de secours.");
   } else {
-    console.log('Connexion à la base de données principale réussie.');
+    console.log("Connexion à la base de données principale réussie.");
   }
 
   next();
 });
 
 // Route pour créer un membre
-app.post('/members', async (req: Request, res: Response) => {
+app.post("/members", async (req: Request, res: Response) => {
   console.log(req.body);
   const { name, role, image } = req.body;
   try {
@@ -59,7 +59,7 @@ app.post('/members', async (req: Request, res: Response) => {
 });
 
 // Route pour récupérer tous les membres
-app.get('/members', async (req: Request, res: Response) => {
+app.get("/members", async (req: Request, res: Response) => {
   try {
     const members = await req.prisma.member.findMany();
     res.json(members);
@@ -69,21 +69,34 @@ app.get('/members', async (req: Request, res: Response) => {
 });
 
 // Route pour supprimer un membre
-app.delete('/members/:name', async (req: Request, res: Response) => {
+app.delete("/members/:name", async (req: Request, res: Response) => {
   const { name } = req.params;
   try {
     await req.prisma.member.delete({
       where: { name: name },
     });
-    res.json({ message: 'Membre supprimé avec succès' });
+    res.json({ message: "Membre supprimé avec succès" });
   } catch (error) {
     res.status(500).json({ error: `Erreur lors de la suppression du membre : ${error}` });
   }
 });
 
-app.get('/health', async (req: Request, res: Response) => {
+app.get("/health", async (req: Request, res: Response) => {
   const isMasterAccessible = await isDatabaseAccessible(masterUrl);
   res.status(200).json({ isMasterAccessible });
+});
+
+function intensiveTask(n: any): any {
+  if (n <= 1) return n;
+  return intensiveTask(n - 1) + intensiveTask(n - 2);
+}
+
+// Endpoint générant une charge CPU
+app.get("/stress", (req: Request, res: Response) => {
+  const number = parseInt(req.query.n) || 35;
+  console.log(`Processing Fibonacci(${number})`);
+  const result = intensiveTask(number);
+  res.send(`Fibonacci(${number}) = ${result}`);
 });
 
 const PORT = process.env.PORT || 4000;
