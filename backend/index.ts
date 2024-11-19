@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { Client } from "pg";
 import cors from "cors";
+import { stringify } from "querystring";
 
 const app = express();
 app.use(cors());
@@ -93,7 +94,7 @@ function intensiveTask(n: any): any {
 
 // Endpoint générant une charge CPU
 app.get("/stress", (req: Request, res: Response) => {
-  const number = parseInt(req.query.n) || 35;
+  const number = parseInt(req.query.n as string) || 35;
   console.log(`Processing Fibonacci(${number})`);
   const result = intensiveTask(number);
   res.send(`Fibonacci(${number}) = ${result}`);
