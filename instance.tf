@@ -41,6 +41,11 @@ resource "aws_instance" "bastion" {
   }
 }
 
+// print bastion ip
+output "bastion_ip" {
+  value = aws_instance.bastion.public_ip
+}
+
 resource "aws_security_group" "allow_postgres" {
   name        = "allow_postgres"
   description = "Allow PostgreSQL inbound traffic"

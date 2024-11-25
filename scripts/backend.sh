@@ -13,6 +13,7 @@ apt upgrade -y
 
 # Install git
 apt-get install git -y
+apt install stress -y
 
 # Clone the repository
 git clone https://github.com/Ligne8/GenArchi-P2.git app

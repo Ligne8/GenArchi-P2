@@ -94,6 +94,10 @@ resource "aws_launch_template" "backend-launchtemplate" {
   instance_type = "t2.micro"
   key_name      = "ligne8-key"
 
+  monitoring {
+    enabled = true 
+  }
+
   network_interfaces {
     security_groups = [aws_security_group.allow_ssh.id, aws_security_group.sg-allow-port-4000.id]
   }
@@ -249,6 +253,7 @@ resource "aws_autoscaling_policy" "cpu-policy-scaleup-frontend" {
   scaling_adjustment     = 1 
   cooldown               = 300
   policy_type            = "SimpleScaling"
+  depends_on = [aws_autoscaling_group.frontend-asg]
 }
 
 resource "aws_autoscaling_policy" "cpu-policy-scaleup-backend" {
@@ -258,19 +263,21 @@ resource "aws_autoscaling_policy" "cpu-policy-scaleup-backend" {
   scaling_adjustment     = 1 
   cooldown               = 300
   policy_type            = "SimpleScaling"
+  depends_on = [aws_autoscaling_group.backend-asg]
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu-alarm-scaleup-frontend" {
-  alarm_name          = "cpu-alarm-frontend-asg"
+  alarm_name          = "cpu--frontend-asg"
   alarm_description   = "cpu-alarm-frontend-asg"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 2
+  evaluation_periods  = 1
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = 120 #seconds 10
+  period              = 10
   statistic           = "Average"
-  threshold           = 50
+  threshold           = 80
 
+  depends_on = [aws_autoscaling_group.frontend-asg]
   dimensions = {
     "AutoScalingGroupName" = "frontend-asg"
   }
@@ -283,13 +290,14 @@ resource "aws_cloudwatch_metric_alarm" "cpu-alarm-scaleup-backend" {
   alarm_name          = "cpu-alarm-backend-asg"
   alarm_description   = "cpu-alarm-backend-asg"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 2
+  evaluation_periods  = 1
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = 120 #seconds 10
+  period              = 10 
   statistic           = "Average"
-  threshold           = 50
+  threshold           = 80
 
+  depends_on = [aws_autoscaling_group.backend-asg]
   dimensions = {
     "AutoScalingGroupName" = "backend-asg"
   }
@@ -307,18 +315,20 @@ resource "aws_autoscaling_policy" "cpu-policy-scaledown-backend" {
   scaling_adjustment     = "-1"
   cooldown               = 120
   policy_type            = "SimpleScaling"
+  depends_on = [aws_autoscaling_group.backend-asg]
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu-alarm-scaledown-backend" {
   alarm_name          = "cpu-alarm-scaledown-backend-asg"
   alarm_description   = "cpu-alarm-scaledown-backend-asg"
   comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = 2
+  evaluation_periods  = 1
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = 120 #10
+  period              = 10
   statistic           = "Average"
-  threshold           = 5
+  threshold           = 20
+  depends_on = [aws_autoscaling_group.backend-asg]
 
   dimensions = {
     "AutoScalingGroupName" = "backend-asg"
@@ -336,23 +346,30 @@ resource "aws_autoscaling_policy" "cpu-policy-scaledown-frontend" {
   scaling_adjustment     = "-1"
   cooldown               = 120
   policy_type            = "SimpleScaling"
+  depends_on = [aws_autoscaling_group.frontend-asg]
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu-alarm-scaledown-frontend" {
   alarm_name          = "cpu-alarm-scaledown-frontend-asg"
   alarm_description   = "cpu-alarm-scaledown-frontend-asg"
   comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = 2
+  evaluation_periods  = 1
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = 120 #10
+  period              = 10
   statistic           = "Average"
-  threshold           = 5
+  threshold           = 20
 
+  depends_on = [aws_autoscaling_group.frontend-asg]
   dimensions = {
     "AutoScalingGroupName" = "frontend-asg"
   }
 
   actions_enabled = true
   alarm_actions   = [aws_autoscaling_policy.cpu-policy-scaledown-frontend.arn]
+}
+
+// print the dns name of the load balancer
+output "frontend_dns" {
+  value = aws_lb.webapp-alb.dns_name
 }
